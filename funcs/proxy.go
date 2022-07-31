@@ -1,4 +1,4 @@
-package main
+package funcs
 
 type Nginx struct {
 	application       *Application
