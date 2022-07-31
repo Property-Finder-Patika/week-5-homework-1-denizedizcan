@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/Property-Finder-Patika/week-5-homework-1-denizedizcan/funcs"
 )
 
 func main() {

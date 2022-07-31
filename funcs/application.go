@@ -1,4 +1,4 @@
-package handleRequests
+package funcs
 
 type Application struct {
 }
