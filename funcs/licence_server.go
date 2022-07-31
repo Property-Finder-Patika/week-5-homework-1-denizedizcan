@@ -1,5 +1,6 @@
 package funcs
 
-type server interface {
-	handleRequest(string, string) (int, string)
+//server interface
+type Server interface {
+	HandleRequest(string, string) (int, string)
 }
