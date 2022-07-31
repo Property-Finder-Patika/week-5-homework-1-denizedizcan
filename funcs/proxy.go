@@ -24,41 +24,40 @@ func NewNginxServer() *Nginx {
 
 //proxy handle request
 func (n *Nginx) HandleRequest(url, method string) (int, string) {
-	value, response := n.application.HandleRequest(url, method)
 
-	if value == 200 {
-		// licence count < max licence count
-		allowed := n.CheckLicenceCount(url)
+	// licence count < max licence count
+	allowed := n.CheckLicenceCount(url)
 
-		if !allowed {
-			//licence count >= mac licence count
-			return 403, "Not Allowed"
-		}
-	} else if value == 201 {
-		// logut licence
-		n.LogutLicenceCount(url)
+	if allowed == "error" {
+		//licence count >= max licence count
+		return 403, "Not Allowed"
 	}
-	return value, response
+	// logut licence
+	n.LogutLicenceCount(url)
+
+	return n.application.HandleRequest(url, method)
 }
 
-func (n *Nginx) CheckLicenceCount(url string) bool {
+func (n *Nginx) CheckLicenceCount(url string) string {
 	// get once licence
 	mu.Lock()
 	defer mu.Unlock()
-	if n.licenceCount >= n.maxLicenceCount {
-		return false
+	if n.licenceCount < n.maxLicenceCount && url == "/licence" {
+		n.licenceCount += 1
+		return "getLicence"
+	} else if url == "/licence/loguot" {
+		return "pass"
 	}
-	n.licenceCount += 1
-	return true
+	return "error"
 }
 
 func (n *Nginx) LogutLicenceCount(url string) bool {
 	// gave back licence
 	mu.Lock()
 	defer mu.Unlock()
-	if n.licenceCount <= 0 {
-		return false
+	if n.licenceCount > 0 && url == "/licence/loguot" {
+		n.licenceCount -= 1
+		return true
 	}
-	n.licenceCount -= 1
-	return true
+	return false
 }
